@@ -2,7 +2,7 @@ package org.armishra.customer.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.armishra.customer.dto.CustomerRegistrationRequest;
+import org.armishra.clients.dto.customer.CustomerRegistrationRequest;
 import org.armishra.customer.service.CustomerService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

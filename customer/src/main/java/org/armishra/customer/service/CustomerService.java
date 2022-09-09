@@ -1,25 +1,23 @@
 package org.armishra.customer.service;
 
 import lombok.AllArgsConstructor;
+import org.armishra.amqp.producer.RabbitMQMessageProducer;
 import org.armishra.clients.dto.fraud.FraudCheckResponse;
 import org.armishra.clients.dto.notification.NotificationRequest;
 import org.armishra.clients.fraud.FraudClient;
-import org.armishra.clients.notification.NotificationClient;
-import org.armishra.customer.dto.CustomerRegistrationRequest;
+import org.armishra.clients.dto.customer.CustomerRegistrationRequest;
 import org.armishra.customer.entity.Customer;
 import org.springframework.stereotype.Service;
 import org.armishra.customer.repo.CustomerRepository;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 @AllArgsConstructor
 public class CustomerService {
 
-    private final RestTemplate restTemplate;
     private final CustomerRepository repository;
     private final FraudClient fraudClient;
-    private final NotificationClient notificationClient;
 
+    private final RabbitMQMessageProducer rabbitMQMessageProducer;
     public void registerCustomer(CustomerRegistrationRequest request) {
         Customer customer = Customer.builder()
                 .firstName(request.firstName())
@@ -36,15 +34,18 @@ public class CustomerService {
             throw new IllegalStateException("Fraudster");
         }
 
-        //todo: send notification, make it async i.e. add to queue
-        notificationClient.sendNotification(
-                new NotificationRequest(
-                        customer.getId(),
-                        customer.getEmail(),
-                        String.format("Hi %s, welcome to my home",
-                                customer.getFirstName()
-                                )
+        NotificationRequest notificationRequest = new NotificationRequest(
+                customer.getId(),
+                customer.getEmail(),
+                String.format("Hi %s, welcome to my home",
+                        customer.getFirstName()
                 )
+        );
+
+        rabbitMQMessageProducer.publish(
+               "internal.exchange",
+               "internal-notification.key",
+               notificationRequest
         );
     }
 }
