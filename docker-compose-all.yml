@@ -46,6 +46,31 @@ services:
     networks:
       - spring
 
+  eureka-server:
+    image: arjitm787/eureka-server:latest
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - spring
+    depends_on:
+      - zipkin
+
+  gateway:
+    image: arjitm787/gateway:latest
+    container_name: gateway
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - spring
+    depends_on:
+      - zipkin
+      - eureka-server
+
   customer:
     image: arjitm787/customer:latest
     container_name: customer
@@ -58,6 +83,7 @@ services:
       - postgres
     depends_on:
       - zipkin
+      - eureka-server
       - postgres
       - rabbitmq
 
@@ -73,6 +99,7 @@ services:
       - postgres
     depends_on:
       - zipkin
+      - eureka-server
       - postgres
       - rabbitmq
 
@@ -88,6 +115,7 @@ services:
       - postgres
     depends_on:
       - zipkin
+      - eureka-server
       - postgres
       - rabbitmq
 

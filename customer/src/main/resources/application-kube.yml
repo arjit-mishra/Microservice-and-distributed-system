@@ -6,17 +6,16 @@ spring:
     name: customer
   # Database config
   datasource:
-    password: 'admin'
+    password: 'password'
     url: jdbc:postgresql://postgres:5432/customer
-    username: 'admin'
+    username: 'arjit'
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: 'true'
     hibernate:
-      ddl-auto: 'create-drop'
-    show-sql: 'true'
+      ddl-auto: 'validate'
   #Zipking URL
   zipkin:
     base-url: http://zipkin:9411
@@ -26,6 +25,4 @@ spring:
 #Eureka config
 eureka:
   client:
-    service-url:
-      defaultZone: http://eureka-server:8761/eureka
     enabled: false
